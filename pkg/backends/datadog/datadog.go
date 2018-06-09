@@ -39,6 +39,8 @@ const (
 	// maxResponseSize is the maximum response size we are willing to read.
 	maxResponseSize     = 10 * 1024
 	maxConcurrentEvents = 20
+
+	defaultEnableHttp2 = false
 )
 
 var (
@@ -387,6 +389,7 @@ func NewClientFromViper(v *viper.Viper) (gostatsd.Backend, error) {
 	dd.SetDefault("client_timeout", defaultClientTimeout)
 	dd.SetDefault("max_request_elapsed_time", defaultMaxRequestElapsedTime)
 	dd.SetDefault("max_requests", defaultMaxRequests)
+	dd.SetDefault("enable-http2", defaultEnableHttp2)
 
 	return NewClient(
 		dd.GetString("api_endpoint"),
@@ -395,6 +398,7 @@ func NewClientFromViper(v *viper.Viper) (gostatsd.Backend, error) {
 		uint(dd.GetInt("metrics_per_batch")),
 		uint(dd.GetInt("max_requests")),
 		dd.GetBool("compress_payload"),
+		dd.GetBool("enable-http2"),
 		dd.GetDuration("client_timeout"),
 		dd.GetDuration("max_request_elapsed_time"),
 		v.GetDuration("flush-interval"), // Main viper, not sub-viper
@@ -403,7 +407,7 @@ func NewClientFromViper(v *viper.Viper) (gostatsd.Backend, error) {
 }
 
 // NewClient returns a new Datadog API client.
-func NewClient(apiEndpoint, apiKey, network string, metricsPerBatch, maxRequests uint, compressPayload bool, clientTimeout, maxRequestElapsedTime, flushInterval time.Duration, disabled gostatsd.TimerSubtypes) (*Client, error) {
+func NewClient(apiEndpoint, apiKey, network string, metricsPerBatch, maxRequests uint, compressPayload, enableHttp2 bool, clientTimeout, maxRequestElapsedTime, flushInterval time.Duration, disabled gostatsd.TimerSubtypes) (*Client, error) {
 	if apiEndpoint == "" {
 		return nil, fmt.Errorf("[%s] apiEndpoint is required", BackendName)
 	}
@@ -441,11 +445,19 @@ func NewClient(apiEndpoint, apiKey, network string, metricsPerBatch, maxRequests
 		},
 		MaxIdleConns:    50,
 		IdleConnTimeout: 1 * time.Minute,
+	}
+	if !enableHttp2 {
 		// A non-nil empty map used in TLSNextProto to disable HTTP/2 support in client.
 		// https://golang.org/doc/go1.6#http2
-		TLSNextProto: map[string](func(string, *tls.Conn) http.RoundTripper){},
+		transport.TLSNextProto = map[string](func(string, *tls.Conn) http.RoundTripper){}
 	}
-	eventsBufferSem := make(chan *bytes.Buffer, maxConcurrentEvents)
+
+	metricsBufferSem := make(chan *bytes.Buffer, maxRequests)
+	for i := uint(0); i < maxRequests; i++ {
+		metricsBufferSem <- &bytes.Buffer{}
+	}
+
+  eventsBufferSem := make(chan *bytes.Buffer, maxConcurrentEvents)
 	for i := uint(0); i < maxConcurrentEvents; i++ {
 		eventsBufferSem <- &bytes.Buffer{}
 	}

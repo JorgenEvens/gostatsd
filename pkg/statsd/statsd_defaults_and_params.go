@@ -2,8 +2,9 @@ package statsd
 
 import (
 	"runtime"
-	"strings"
 	"time"
+
+	"strings"
 
 	"github.com/atlassian/gostatsd"
 
@@ -160,14 +161,14 @@ func AddFlags(fs *pflag.FlagSet) {
 	fs.Duration(ParamCacheNegativeTTL, DefaultCacheNegativeTTL, "Cloud cache TTL for failed lookups")
 	fs.String(ParamMetricsAddr, DefaultMetricsAddr, "Address on which to listen for metrics")
 	fs.String(ParamNamespace, "", "Namespace all metrics")
-	fs.StringSlice(ParamBackends, DefaultBackends, "Comma-separated list of backends")
+	fs.String(ParamBackends, strings.Join(DefaultBackends, " "), "Space separated list of backends")
 	fs.Int(ParamMaxCloudRequests, DefaultMaxCloudRequests, "Maximum number of cloud provider requests per second")
 	fs.Int(ParamBurstCloudRequests, DefaultBurstCloudRequests, "Burst number of cloud provider requests per second")
-	fs.String(ParamDefaultTags, strings.Join(DefaultTags, ","), "Comma-separated list of tags to add to all metrics")
-	fs.String(ParamInternalTags, strings.Join(DefaultInternalTags, ","), "Comma-separated list of tags to add to internal metrics")
+	fs.String(ParamDefaultTags, strings.Join(DefaultTags, " "), "Space separated list of tags to add to all metrics")
+	fs.String(ParamInternalTags, strings.Join(DefaultInternalTags, " "), "Space separated list of tags to add to internal metrics")
 	fs.String(ParamInternalNamespace, DefaultInternalNamespace, "Namespace for internal metrics, may be \"\"")
 	fs.String(ParamStatserType, DefaultStatserType, "Statser type to be used for sending metrics")
-	fs.String(ParamPercentThreshold, strings.Join(toStringSlice(DefaultPercentThreshold), ","), "Comma-separated list of percentiles")
+	fs.String(ParamPercentThreshold, strings.Join(toStringSlice(DefaultPercentThreshold), " "), "Space separated list of percentiles")
 	fs.Bool(ParamHeartbeatEnabled, DefaultHeartbeatEnabled, "Enables heartbeat")
 	fs.Int(ParamReceiveBatchSize, DefaultReceiveBatchSize, "The number of datagrams to read in each receive batch")
 	fs.Bool(ParamConnPerReader, DefaultConnPerReader, "Create a separate connection per reader (requires system support for reusing addresses)")

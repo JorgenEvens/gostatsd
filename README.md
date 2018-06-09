@@ -25,6 +25,8 @@ server based on load. The server can also be run HA and be scaled out, see
 
 Building the server
 -------------------
+Gostatsd currently targets Go 1.10.2.  There are no known hard dependencies in the code beween 1.9 and 1.10.2, but some may be introduced in future.
+
 From the `gostatsd` directory run `make build`. The binary will be built in `build/bin/<arch>/gostatsd`.
 
 You will need to install the build dependencies by running `make setup` in the `gostatsd` directory. This must be done before the first build, and again if the dependencies change.
@@ -38,6 +40,9 @@ defaults. You can use `make run` to run the server with just the `stdout` backen
 to display info on screen.
 You can also run through `docker` by running `make run-docker` which will use `docker-compose`
 to run `gostatsd` with a graphite backend and a grafana dashboard.
+
+While not generally tested on Windows, it should work.  Maximum throughput is likely to be better on
+a linux system, however.
 
 Configuring backends and cloud providers
 ----------------------------------------
@@ -119,7 +124,7 @@ Sending metrics
 ---------------
 The server listens for UDP packets on the address given by the `--metrics-addr` flag,
 aggregates them, then sends them to the backend servers given by the `--backends`
-flag (comma separated list of backend names).
+flag (space separated list of backend names).
 
 Currently supported backends are:
 

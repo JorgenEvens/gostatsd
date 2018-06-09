@@ -38,7 +38,7 @@ func TestRetries(t *testing.T) {
 	ts := httptest.NewServer(mux)
 	defer ts.Close()
 
-	client, err := NewClient(ts.URL, "apiKey123", "tcp", defaultMetricsPerBatch, defaultMaxRequests, true, 1*time.Second, 2*time.Second, 1*time.Second, gostatsd.TimerSubtypes{})
+	client, err := NewClient(ts.URL, "apiKey123", "tcp", defaultMetricsPerBatch, defaultMaxRequests, true, false, 1*time.Second, 2*time.Second, 1*time.Second, gostatsd.TimerSubtypes{})
 	require.NoError(t, err)
 	stgr := stager.New()
 	defer stgr.Shutdown()
@@ -71,7 +71,7 @@ func TestSendMetricsInMultipleBatches(t *testing.T) {
 	ts := httptest.NewServer(mux)
 	defer ts.Close()
 
-	client, err := NewClient(ts.URL, "apiKey123", "tcp", 1, defaultMaxRequests, true, 1*time.Second, 2*time.Second, 1*time.Second, gostatsd.TimerSubtypes{})
+	client, err := NewClient(ts.URL, "apiKey123", "tcp", 1, defaultMaxRequests, true, false, 1*time.Second, 2*time.Second, 1*time.Second, gostatsd.TimerSubtypes{})
 	require.NoError(t, err)
 	stgr := stager.New()
 	defer stgr.Shutdown()
@@ -125,7 +125,7 @@ func TestSendMetrics(t *testing.T) {
 	ts := httptest.NewServer(mux)
 	defer ts.Close()
 
-	client, err := NewClient(ts.URL, "apiKey123", "tcp", 1000, defaultMaxRequests, true, 1*time.Second, 2*time.Second, 1100*time.Millisecond, gostatsd.TimerSubtypes{})
+	client, err := NewClient(ts.URL, "apiKey123", "tcp", 1000, defaultMaxRequests, true, false, 1*time.Second, 2*time.Second, 1100*time.Millisecond, gostatsd.TimerSubtypes{})
 	require.NoError(t, err)
 	stgr := stager.New()
 	defer stgr.Shutdown()

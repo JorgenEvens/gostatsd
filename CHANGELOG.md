@@ -1,3 +1,25 @@
+7.0.1
+-----
+- Roll back change to configuration, due to https://github.com/spf13/viper/issues/380.  Documentation is still valid.
+
+7.0.0
+-----
+- Fix a bug in the cache provider where transient failures were replacing good cache
+- Started passing around a logger, not used everywhere yet
+- Documentation fixes
+
+6.2.0
+-----
+- Added `enable-http2` flag for Datadog backend to control HTTP/2 support, defaults to `false`
+
+6.1.2
+-----
+- Build with Go 1.10.2
+
+6.1.1
+-----
+- Fixed a bug making the service not work on Windows.
+
 6.1.0
 -----
 - Add new flag `--statser-type` to make internal metric destination configurable.  Defaults to `internal`,
